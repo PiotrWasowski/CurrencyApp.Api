@@ -1,4 +1,5 @@
-﻿using CurrencyApp.Application.Services;
+﻿using CurrencyApp.Application.Enums;
+using CurrencyApp.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CurrencyApp.Api.Controllers
@@ -16,6 +17,7 @@ namespace CurrencyApp.Api.Controllers
 
         [HttpGet]
         public async Task<IActionResult> Get(
+            [FromQuery] CurrencyApiType apiType,
             [FromQuery] string from, 
             [FromQuery] string to, 
             [FromQuery] DateTime? fromDate, 
@@ -33,7 +35,7 @@ namespace CurrencyApp.Api.Controllers
             if (start > stop)
                 return BadRequest(new { message = "Invalid date range!" });
 
-            var result = await _service.GetStats(from, to, start, stop);
+            var result = await _service.GetStats(apiType, from, to, start, stop);
             
             if (result == null)
                 return NoContent();

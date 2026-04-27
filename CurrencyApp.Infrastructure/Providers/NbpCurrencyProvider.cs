@@ -2,8 +2,8 @@
 using CurrencyApp.Application.Exceptions;
 using CurrencyApp.Application.Interfaces;
 using System.Net.Http.Json;
-using Microsoft.Extensions.Options;
 using CurrencyApp.Application.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace CurrencyApp.Infrastructure.Providers
 {
@@ -12,10 +12,10 @@ namespace CurrencyApp.Infrastructure.Providers
         private readonly HttpClient _httpClient;
         private readonly CurrencySettings _settings;
 
-        public NbpCurrencyProvider(HttpClient httpClient, CurrencySettings settings)
+        public NbpCurrencyProvider(HttpClient httpClient, IOptions<CurrencySettings> settings)
         {
             _httpClient = httpClient;
-            _settings = settings;
+            _settings = settings.Value;
         }
 
         public async Task<List<CurrencyRateDto>> GetRatesAsync(string from, string to, DateTime fromDate, DateTime toDate)

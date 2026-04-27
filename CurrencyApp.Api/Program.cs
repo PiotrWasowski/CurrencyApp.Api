@@ -1,11 +1,19 @@
 using CurrencyApp.Api.Middleware;
 using CurrencyApp.Application.Configuration;
+using CurrencyApp.Application.Factories;
 using CurrencyApp.Application.Interfaces;
 using CurrencyApp.Application.Services;
 using CurrencyApp.Infrastructure.Providers;
 using Microsoft.Extensions.Options;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 
 builder.Services.Configure<CurrencySettings>(builder.Configuration.GetSection("CurrencySettings"));
 
@@ -15,6 +23,8 @@ builder.Services.AddHttpClient<ICurrencyProvider, NbpCurrencyProvider>((sp, clie
     var settings = sp.GetRequiredService<IOptions<CurrencySettings>>().Value;
     client.BaseAddress = new Uri(settings.NbpApiBaseUrl);
 });
+
+builder.Services.AddScoped<ICurrencyProviderFactory, CurrencyProviderFactory>();
 
 builder.Services.AddScoped<CurrencyService>();
 
