@@ -23,13 +23,13 @@ namespace CurrencyApp.Api.Controllers
             [FromQuery] DateTime? toDate)
         {
             if (string.IsNullOrEmpty(from) || string.IsNullOrEmpty(to))
-                return BadRequest("Currency codes are required!");
+                return BadRequest(new { message = "Currency codes are required" });
 
             var start = fromDate ?? DateTime.Today;
             var stop = toDate ?? DateTime.Today;
 
             if (start > stop)
-                return BadRequest("Invalid date range!");
+                return BadRequest(new { message = "Invalid date range!" });
 
             var result = await _service.GetStats(from, to, start, stop);
             
