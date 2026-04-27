@@ -1,4 +1,5 @@
 using CurrencyApp.Application.Interfaces;
+using CurrencyApp.Application.Services;
 using CurrencyApp.Infrastructure.Providers;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,6 +9,8 @@ builder.Services.AddHttpClient<ICurrencyProvider, NbpCurrencyProvider>(client =>
 {
     client.BaseAddress = new Uri("https://api.nbp.pl/api/");
 });
+
+builder.Services.AddScoped<CurrencyService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
