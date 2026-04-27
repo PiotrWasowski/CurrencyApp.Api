@@ -1,3 +1,4 @@
+using CurrencyApp.Api.Middleware;
 using CurrencyApp.Application.Interfaces;
 using CurrencyApp.Application.Services;
 using CurrencyApp.Infrastructure.Providers;
@@ -27,6 +28,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseMiddleware<ErrorHandlingMiddleware>();
 
 app.UseAuthorization();
 
