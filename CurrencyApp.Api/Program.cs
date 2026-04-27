@@ -1,14 +1,19 @@
 using CurrencyApp.Api.Middleware;
+using CurrencyApp.Application.Configuration;
 using CurrencyApp.Application.Interfaces;
 using CurrencyApp.Application.Services;
 using CurrencyApp.Infrastructure.Providers;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.Configure<CurrencySettings>(builder.Configuration.GetSection("CurrencySettings"));
+
 // Add services to the container.
-builder.Services.AddHttpClient<ICurrencyProvider, NbpCurrencyProvider>(client =>
+builder.Services.AddHttpClient<ICurrencyProvider, NbpCurrencyProvider>((sp, client) =>
 {
-    client.BaseAddress = new Uri("https://api.nbp.pl/api/");
+    var settings = sp.GetRequiredService<IOptions<CurrencySettings>>().Value;
+    client.BaseAddress = new Uri(settings.NbpApiBaseUrl);
 });
 
 builder.Services.AddScoped<CurrencyService>();

@@ -2,16 +2,20 @@
 using CurrencyApp.Application.Exceptions;
 using CurrencyApp.Application.Interfaces;
 using System.Net.Http.Json;
+using Microsoft.Extensions.Options;
+using CurrencyApp.Application.Configuration;
 
 namespace CurrencyApp.Infrastructure.Providers
 {
     public class NbpCurrencyProvider: ICurrencyProvider
     {
         private readonly HttpClient _httpClient;
+        private readonly CurrencySettings _settings;
 
-        public NbpCurrencyProvider(HttpClient httpClient)
+        public NbpCurrencyProvider(HttpClient httpClient, CurrencySettings settings)
         {
             _httpClient = httpClient;
+            _settings = settings;
         }
 
         public async Task<List<CurrencyRateDto>> GetRatesAsync(string from, string to, DateTime fromDate, DateTime toDate)
@@ -62,7 +66,9 @@ namespace CurrencyApp.Infrastructure.Providers
             DateTime fromDate,
             DateTime toDate)
         {
-            var url = $"exchangerates/rates/A/{currency}/{fromDate:yyyy-MM-dd}/{toDate:yyyy-MM-dd}/";
+            var format = _settings.DateFormat;
+
+            var url = $"exchangerates/rates/A/{currency}/{fromDate.ToString(format)}/{toDate.ToString(format)}/";
 
             var response = await _httpClient.GetAsync(url);
 

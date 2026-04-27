@@ -1,5 +1,4 @@
 ﻿using CurrencyApp.Application.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CurrencyApp.Api.Controllers
