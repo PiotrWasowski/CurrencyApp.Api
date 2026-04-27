@@ -1,5 +1,6 @@
 ﻿using CurrencyApp.Application.DTOs;
 using CurrencyApp.Application.Interfaces;
+using CurrencyApp.Application.Services;
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
@@ -31,7 +32,7 @@ namespace CurrencyApp.Tests
 
             var service = new CurrencyService(_providerMock.Object);
 
-            var result = await service.GetCurrencyStatsAsync("EUR", "PLN", DateTime.Today, DateTime.Today);
+            var result = await service.GetStats("EUR", "PLN", DateTime.Today, DateTime.Today);
 
             result.Min.Should().Be(4);
             result.Max.Should().Be(6);
