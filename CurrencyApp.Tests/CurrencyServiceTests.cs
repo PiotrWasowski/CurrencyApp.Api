@@ -38,5 +38,17 @@ namespace CurrencyApp.Tests
             result.Max.Should().Be(6);
             result.Avg.Should().Be(5);
         }
+
+        [Test]
+        public async Task Should_Return_null_if_no_data()
+        {
+            _providerMock
+                .Setup(x => x.GetRatesAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                .ReturnsAsync(new List<CurrencyRateDto>());
+
+            var service = new CurrencyService(_providerMock.Object);
+            var result = await service.GetStats("EUR", "PLN", DateTime.Today, DateTime.Today);
+            result.Should().BeNull();
+        }
     }
 }
