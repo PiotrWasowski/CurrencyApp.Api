@@ -14,6 +14,12 @@ namespace CurrencyApp.Application.Services
         public async Task<CurrencyStatsDto> GetStats(string from, string to, DateTime fromDate, DateTime toDate)
         {
             var rates = await _provider.GetRatesAsync(from, to, fromDate, toDate);
+
+            if (rates == null || !rates.Any())
+            {
+                return null;
+            }
+
             return new CurrencyStatsDto
             {
                 Min = rates.Min(r => r.Rate),
