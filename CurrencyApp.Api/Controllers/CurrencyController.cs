@@ -42,5 +42,14 @@ namespace CurrencyApp.Api.Controllers
 
             return Ok(result);
         }
+
+        
+        [HttpGet("currencies")]
+        public async Task<IActionResult> GetCurrencies([FromQuery] CurrencyApiType apiType)
+        {
+            var result = await _service.GetCurrencies(apiType);
+
+            return Ok(result);
+        }
     }
 }
