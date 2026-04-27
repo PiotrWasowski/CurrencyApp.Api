@@ -19,9 +19,9 @@
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unhandled exception occurred.");
-                context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-                await context.Response.WriteAsync("Internal server error");
+                _logger.LogError(ex, "External API error");
+                context.Response.StatusCode = StatusCodes.Status502BadGateway;
+                await context.Response.WriteAsync("External API error");
             }
         }
     }
