@@ -30,5 +30,12 @@ namespace CurrencyApp.Application.Services
                 Rates = rates
             };
         }
+
+        public async Task<List<CurrencyDto>> GetCurrencies(CurrencyApiType apiType)
+        {
+            var provider = _factory.GetProvider(apiType);
+
+            return await provider.GetCurrenciesAsync();
+        }
     }
 }
