@@ -2,5 +2,6 @@
   <Project Path="../CurrencyApp.Application/CurrencyApp.Application.csproj" />
   <Project Path="../CurrencyApp.Domain/CurrencyApp.Domain.csproj" />
   <Project Path="../CurrencyApp.Infrastructure/CurrencyApp.Infrastructure.csproj" />
+  <Project Path="../CurrencyApp.Tests/CurrencyApp.Tests.csproj" />
   <Project Path="CurrencyApp.Api.csproj" />
 </Solution>
