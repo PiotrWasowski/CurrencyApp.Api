@@ -16,7 +16,53 @@ namespace CurrencyApp.Infrastructure.Providers
 
         public async Task<List<CurrencyRateDto>> GetRatesAsync(string from, string to, DateTime fromDate, DateTime toDate)
         {
-            var url = $"exchangerates/rates/A/{from}/{fromDate:yyyy-MM-dd}/{toDate:yyyy-MM-dd}/";
+            if (from == to)
+                return new List<CurrencyRateDto>();
+
+            // PLN -> X
+            if (from == "PLN")
+            {
+                var toRates = await GetRates(to, fromDate, toDate);
+
+                return toRates.Select(r => new CurrencyRateDto
+                {
+                    Date = r.Date,
+                    Rate = 1 / r.Rate
+                }).ToList();
+            }
+
+            // X -> PLN
+            if (to == "PLN")
+            {
+                return await GetRates(from, fromDate, toDate);
+            }
+
+            // X -> PLN
+            if (to == "PLN")
+            {
+                return await GetRates(from, fromDate, toDate);
+            }
+
+            // X -> Y
+            var fromRates = await GetRates(from, fromDate, toDate);
+            var toRates2 = await GetRates(to, fromDate, toDate);
+
+            return fromRates.Join(toRates2,
+                f => f.Date,
+                t => t.Date,
+                (f, t) => new CurrencyRateDto
+                {
+                    Date = f.Date,
+                    Rate = f.Rate / t.Rate
+                }).ToList();
+        }
+
+        private async Task<List<CurrencyRateDto>> GetRates(
+            string currency,
+            DateTime fromDate,
+            DateTime toDate)
+        {
+            var url = $"exchangerates/rates/A/{currency}/{fromDate:yyyy-MM-dd}/{toDate:yyyy-MM-dd}/";
 
             var response = await _httpClient.GetAsync(url);
 
