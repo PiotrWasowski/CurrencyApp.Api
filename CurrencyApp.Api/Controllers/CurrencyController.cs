@@ -28,6 +28,9 @@ namespace CurrencyApp.Api.Controllers
             var start = fromDate ?? DateTime.Today;
             var stop = toDate ?? DateTime.Today;
 
+            if (start > DateTime.Today || stop > DateTime.Today)
+                return BadRequest(new { message = "Dates cannot be in the future" });
+
             if (start > stop)
                 return BadRequest(new { message = "Invalid date range!" });
 
