@@ -18,6 +18,22 @@ namespace CurrencyApp.Infrastructure.Providers
             _settings = settings.Value;
         }
 
+        public async Task<List<CurrencyDto>> GetCurrenciesAsync()
+        {
+            var response = await _httpClient.GetAsync("exchangerates/tables/A/");
+
+            if (!response.IsSuccessStatusCode)
+                throw new ExternalApiException("NBP API error");
+
+            var data = await response.Content.ReadFromJsonAsync<List<NbpTableResponse>>();
+
+            return data.First().rates.Select(r => new CurrencyDto
+            {
+                Code = r.code,
+                Name = r.currency
+            }).ToList();
+        }
+
         public async Task<List<CurrencyRateDto>> GetRatesAsync(string from, string to, DateTime fromDate, DateTime toDate)
         {
             if (from == to)
