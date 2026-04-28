@@ -26,24 +26,26 @@ export class CurrencyComponent implements OnInit {
       toDate: ['']
     });
   }
-
-  currencies: any[] = [];
+    
   result: any;
   loading = false;
   error = '';
 
   
-
   ngOnInit() {
     this.loadCurrencies();
   }
 
+  currencies$!: Observable<any[]>;
+
   loadCurrencies() {
     const api = this.form.value.apiType!;
-    this.service.getCurrencies(api).subscribe({
-      next: res => this.currencies = res,
-      error: () => this.error = 'Błąd pobierania walut'
-    });
+    this.currencies$ = this.service.getCurrencies(api).pipe(
+      catchError(err => {
+        this.error = 'Nie udało się pobrać listy walut';
+        return of([]);
+      })
+    );;
   }
 
   result$!: Observable<any>;

@@ -5,13 +5,13 @@
   </select>
 
   <select formControlName="from">
-    <option *ngFor="let c of currencies" [value]="c.code">
+    <option *ngFor="let c of (currencies$ | async)" [value]="c.code">
       {{ c.display }}
     </option>
   </select>
 
   <select formControlName="to">
-    <option *ngFor="let c of currencies" [value]="c.code">
+    <option *ngFor="let c of (currencies$ | async)" [value]="c.code">
       {{ c.display }}
     </option>
   </select>
