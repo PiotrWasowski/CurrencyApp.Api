@@ -1,23 +1,30 @@
-﻿using CurrencyApp.Application.DTOs;
+﻿using CurrencyApp.Application.Configuration;
+using CurrencyApp.Application.DTOs;
 using CurrencyApp.Application.Enums;
 using CurrencyApp.Application.Interfaces;
 using CurrencyApp.Application.Services;
 using FluentAssertions;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 using Moq;
-using NUnit.Framework;
 
 namespace CurrencyApp.Tests
 {
+    [TestFixture]
     public class CurrencyServiceTests
     {
         private Mock<ICurrencyProvider> _providerMock;
         private Mock<ICurrencyProviderFactory> _factoryMock;
+        private IMemoryCache _memoryCache;
+        IOptions<CurrencySettings> _settings;
 
         [SetUp]
         public void Setup()
         {
             _factoryMock = new Mock<ICurrencyProviderFactory>();
             _providerMock = new Mock<ICurrencyProvider>();
+            _memoryCache = new MemoryCache(new MemoryCacheOptions());
+            _settings = Options.Create(new CurrencySettings { CacheDurationMinutes = 60 });
         }
 
         [Test]
@@ -37,7 +44,7 @@ namespace CurrencyApp.Tests
                 .Setup(x => x.GetProvider(CurrencyApiType.NBP))
                 .Returns(_providerMock.Object);
 
-            var service = new CurrencyService(_factoryMock.Object);
+            var service = new CurrencyService(_factoryMock.Object, _settings, _memoryCache);
 
             var result = await service.GetStats(CurrencyApiType.NBP, "EUR", "PLN", DateTime.Today, DateTime.Today);
 
@@ -57,9 +64,15 @@ namespace CurrencyApp.Tests
                 .Setup(x => x.GetProvider(CurrencyApiType.NBP))
                 .Returns(_providerMock.Object);
 
-            var service = new CurrencyService(_factoryMock.Object);
+            var service = new CurrencyService(_factoryMock.Object, _settings, _memoryCache);
             var result = await service.GetStats(CurrencyApiType.NBP, "EUR", "PLN", DateTime.Today, DateTime.Today);
             result.Should().BeNull();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            _memoryCache.Dispose();
         }
     }
 }
