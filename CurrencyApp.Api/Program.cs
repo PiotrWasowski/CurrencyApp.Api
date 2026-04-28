@@ -15,6 +15,17 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngular", policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:4200")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
 builder.Services.Configure<CurrencySettings>(builder.Configuration.GetSection("CurrencySettings"));
 
 // Add services to the container.
@@ -47,6 +58,10 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseMiddleware<ErrorHandlingMiddleware>();
+
+app.UseRouting();
+
+app.UseCors("AllowAngular");
 
 app.UseAuthorization();
 

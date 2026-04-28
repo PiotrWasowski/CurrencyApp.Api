@@ -1,9 +1,10 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { CurrencyComponent } from './features/currency/currency.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, CurrencyComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
