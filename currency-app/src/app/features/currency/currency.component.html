@@ -25,15 +25,17 @@
 <div *ngIf="loading">Ładowanie...</div>
 <div *ngIf="error">{{ error }}</div>
 
-<div *ngIf="result">
-  <p>Min: {{ result.min }}</p>
-  <p>Max: {{ result.max }}</p>
-  <p>Avg: {{ result.avg }}</p>
+<div *ngIf="result$ | async as result">
+  <ng-container *ngIf="result">
+    <p>Min: {{ result.min }}</p>
+    <p>Max: {{ result.max }}</p>
+    <p>Avg: {{ result.avg }}</p>
 
-  <table>
-    <tr *ngFor="let r of result.rates">
-      <td>{{ r.date }}</td>
-      <td>{{ r.rate }}</td>
-    </tr>
-  </table>
+    <table>
+      <tr *ngFor="let r of result.rates">
+        <td>{{ r.date }}</td>
+        <td>{{ r.rate }}</td>
+      </tr>
+    </table>
+  </ng-container>  
 </div>
