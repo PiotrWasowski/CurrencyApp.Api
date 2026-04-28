@@ -11,6 +11,8 @@ namespace CurrencyApp.Infrastructure.Providers
     {
         private readonly HttpClient _httpClient;
         private readonly CurrencySettings _settings;
+        private const string PlnCode = "PLN";
+        private const string PlnName = "polski złoty";
 
         public NbpCurrencyProvider(HttpClient httpClient, IOptions<CurrencySettings> settings)
         {
@@ -23,15 +25,30 @@ namespace CurrencyApp.Infrastructure.Providers
             var response = await _httpClient.GetAsync("exchangerates/tables/A/");
 
             if (!response.IsSuccessStatusCode)
-                throw new ExternalApiException("NBP API error");
+                throw new ExternalApiException($"NBP API error: {response.StatusCode}");
 
             var data = await response.Content.ReadFromJsonAsync<List<NbpTableResponse>>();
 
-            return data.First().rates.Select(r => new CurrencyDto
+            var table = data?.FirstOrDefault();
+            if (table?.rates == null)
+                return [];
+
+            var list = table.rates.Select(r => new CurrencyDto
             {
                 Code = r.code,
                 Name = r.currency
             }).ToList();
+
+            if (!list.Any(d => d.Code == PlnCode))
+            {
+                list.Add(new CurrencyDto
+                {
+                    Code = PlnCode,
+                    Name = PlnName
+                });
+            }
+
+            return list;
         }
 
         public async Task<List<CurrencyRateDto>> GetRatesAsync(string from, string to, DateTime fromDate, DateTime toDate)
