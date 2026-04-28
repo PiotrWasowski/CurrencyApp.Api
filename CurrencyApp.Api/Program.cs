@@ -24,6 +24,8 @@ builder.Services.AddHttpClient<ICurrencyProvider, NbpCurrencyProvider>((sp, clie
     client.BaseAddress = new Uri(settings.NbpApiBaseUrl);
 });
 
+builder.Services.AddMemoryCache();
+
 builder.Services.AddScoped<ICurrencyProviderFactory, CurrencyProviderFactory>();
 
 builder.Services.AddScoped<CurrencyService>();
