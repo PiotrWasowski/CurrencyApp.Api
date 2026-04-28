@@ -3,7 +3,7 @@ using CurrencyApp.Application.DTOs;
 using CurrencyApp.Application.Enums;
 using CurrencyApp.Application.Interfaces;
 using Microsoft.Extensions.Options;
-using System.Runtime;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace CurrencyApp.Application.Services
 {
@@ -11,11 +11,16 @@ namespace CurrencyApp.Application.Services
     {
         private readonly ICurrencyProviderFactory _factory;
         private readonly CurrencySettings _settings;
+        private readonly IMemoryCache _cache;
 
-        public CurrencyService(ICurrencyProviderFactory factory, IOptions<CurrencySettings> settings)
+        public CurrencyService(
+            ICurrencyProviderFactory factory, 
+            IOptions<CurrencySettings> settings,
+            IMemoryCache memoryCache)
         {
             _factory = factory;
             _settings = settings.Value;
+            _cache = memoryCache;
         }
 
         public async Task<CurrencyStatsDto> GetStats(CurrencyApiType apiType, string from, string to, DateTime fromDate, DateTime toDate)
@@ -39,10 +44,20 @@ namespace CurrencyApp.Application.Services
 
         public async Task<List<CurrencyDto>> GetCurrencies(CurrencyApiType apiType)
         {
+            var cacheKey = $"currencies_{apiType}";
+
+            if (_cache.TryGetValue(cacheKey, out List<CurrencyDto> cached))
+            {
+                return cached;
+            }
+
             var provider = _factory.GetProvider(apiType);
 
             var list = await provider.GetCurrenciesAsync();
-            return ApplySorting(list);
+            var sortedList = ApplySorting(list);
+
+            _cache.Set(cacheKey, sortedList, TimeSpan.FromHours(1));
+            return sortedList;
         }
 
         private List<CurrencyDto> ApplySorting(List<CurrencyDto> list)
