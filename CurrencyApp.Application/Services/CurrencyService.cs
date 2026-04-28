@@ -56,7 +56,7 @@ namespace CurrencyApp.Application.Services
             var list = await provider.GetCurrenciesAsync();
             var sortedList = ApplySorting(list);
 
-            _cache.Set(cacheKey, sortedList, TimeSpan.FromHours(1));
+            _cache.Set(cacheKey, sortedList, TimeSpan.FromHours(_settings.CacheDurationMinutes));
             return sortedList;
         }
 
