@@ -36,6 +36,7 @@ export class CurrencyComponent implements OnInit {
 
   currencies$!: Observable<any[]>;
   result$!: Observable<any>;
+  today = new Date();
 
   constructor(
     private service: CurrencyService,
@@ -45,9 +46,8 @@ export class CurrencyComponent implements OnInit {
       apiType: ['Nbp', Validators.required],
       from: ['', Validators.required],
       to: ['', Validators.required],
-
-      fromDate: ['', [Validators.required, this.futureDateValidator.bind(this)]],
-      toDate: ['', [Validators.required, this.futureDateValidator.bind(this)]]
+      fromDate: [this.today, [Validators.required, this.futureDateValidator.bind(this)]],
+      toDate: [this.today, [Validators.required, this.futureDateValidator.bind(this)]]
     }, { validators: this.dateRangeValidator });
   }
 
@@ -56,8 +56,8 @@ export class CurrencyComponent implements OnInit {
   }
 
   dateRangeValidator(group: FormGroup) {
-    const from = group.get('fromDate')?.value;
-    const to = group.get('toDate')?.value;
+    const from = group.get('fromDate')?.value.setHours(0, 0, 0, 0);
+    const to = group.get('toDate')?.value.setHours(0, 0, 0, 0);
 
     if (from && to && new Date(from) > new Date(to)) {
       return { dateRange: true };
@@ -99,10 +99,14 @@ export class CurrencyComponent implements OnInit {
 
     const formValue = this.form.value;
 
+    const today = new Date();
+    const fromDate = formValue.fromDate || today;
+    const toDate = formValue.toDate || today;
+
     const request = {
       ...formValue,
-      fromDate: this.formatDate(formValue.fromDate),
-      toDate: this.formatDate(formValue.toDate)
+      fromDate: this.formatDate(fromDate),
+      toDate: this.formatDate(toDate)
     };
 
     this.result$ = this.service.getRates(request).pipe(
@@ -115,6 +119,12 @@ export class CurrencyComponent implements OnInit {
       }),
       finalize(() => {
         this.loading = false;
+        if (!formValue.fromDate || !formValue.toDate) {
+          this.form.patchValue({
+            fromDate: fromDate,
+            toDate: toDate
+          });
+        }
       })
     );
   }
