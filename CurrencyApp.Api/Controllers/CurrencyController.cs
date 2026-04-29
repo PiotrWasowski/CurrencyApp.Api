@@ -1,6 +1,7 @@
 ﻿using CurrencyApp.Application.Enums;
 using CurrencyApp.Application.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace CurrencyApp.Api.Controllers
 {
@@ -16,6 +17,7 @@ namespace CurrencyApp.Api.Controllers
         }
 
         [HttpGet]
+        [EnableRateLimiting("stats-limit")]
         public async Task<IActionResult> Get(
             [FromQuery] CurrencyApiType apiType,
             [FromQuery] string from, 

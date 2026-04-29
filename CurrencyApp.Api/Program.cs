@@ -4,9 +4,11 @@ using CurrencyApp.Application.Factories;
 using CurrencyApp.Application.Interfaces;
 using CurrencyApp.Application.Services;
 using CurrencyApp.Infrastructure.Providers;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Options;
 using Serilog;
 using System.Text.Json.Serialization;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,6 +51,19 @@ builder.Services.AddScoped<ICurrencyProviderFactory, CurrencyProviderFactory>();
 
 builder.Services.AddScoped<CurrencyService>();
 
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    options.AddFixedWindowLimiter("stats-limit", opt =>
+    {
+        opt.Window = TimeSpan.FromSeconds(10);
+        opt.PermitLimit = 5;
+        opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        opt.QueueLimit = 0;
+    });
+});
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -74,6 +89,8 @@ app.UseRouting();
 app.UseCors("AllowAngular");
 
 app.UseAuthorization();
+
+app.UseRateLimiter();
 
 app.MapControllers();
 
