@@ -1,4 +1,5 @@
-﻿using CurrencyApp.Application.Configuration;
+﻿using CurrencyApp.Application.Common;
+using CurrencyApp.Application.Configuration;
 using CurrencyApp.Application.DTOs;
 using CurrencyApp.Application.Enums;
 using CurrencyApp.Application.Interfaces;
@@ -25,25 +26,27 @@ namespace CurrencyApp.Application.Services
             _cache = memoryCache;
         }
 
-        public async Task<CurrencyStatsDto?> GetStats(CurrencyApiType apiType, string from, string to, DateTime fromDate, DateTime toDate)
+        public async Task<Result<CurrencyStatsDto>> GetStats(CurrencyApiType apiType, string from, string to, DateTime fromDate, DateTime toDate)
         {
             var provider = GetProvider(apiType);
             var rates = await provider.GetRatesAsync(from, to, fromDate, toDate);
 
             if (rates == null || !rates.Any())
             {
-                return null;
+                return Result<CurrencyStatsDto>.Fail("No data for given range");
             }
 
             var stats = CurrencyStatisticsCalculator.Calculate(rates);
 
-            return new CurrencyStatsDto
+            var dto = new CurrencyStatsDto
             {
                 Min = stats.Min,
                 Max = stats.Max,
                 Avg = stats.Average,
-                Rates = rates.Select(r => MapRate(r)).ToList()
+                Rates = rates.Select(MapRate).ToList()
             };
+
+            return Result<CurrencyStatsDto>.Ok(dto);
         }
 
         public async Task<List<CurrencyDto>> GetCurrencies(CurrencyApiType apiType)

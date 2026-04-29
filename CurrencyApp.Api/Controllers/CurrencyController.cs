@@ -36,11 +36,11 @@ namespace CurrencyApp.Api.Controllers
                 return BadRequest(new { message = "Invalid date range!" });
 
             var result = await _service.GetStats(apiType, from, to, start, stop);
-            
-            if (result == null)
+
+            if (!result.IsSuccess)
                 return NoContent();
 
-            return Ok(result);
+            return Ok(result.Value);
         }
 
         

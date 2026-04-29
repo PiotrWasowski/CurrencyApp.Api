@@ -47,10 +47,10 @@ namespace CurrencyApp.Tests
             var service = new CurrencyService(_factoryMock.Object, _settings, _memoryCache);
 
             var result = await service.GetStats(CurrencyApiType.NBP, "EUR", "PLN", DateTime.Today, DateTime.Today);
-
-            result.Min.Should().Be(4);
-            result.Max.Should().Be(6);
-            result.Avg.Should().Be(5);
+            result.Value.Should().NotBeNull();
+            result.Value.Min.Should().Be(4);
+            result.Value.Max.Should().Be(6);
+            result.Value.Avg.Should().Be(5);
         }
 
         [Test]
@@ -66,7 +66,7 @@ namespace CurrencyApp.Tests
 
             var service = new CurrencyService(_factoryMock.Object, _settings, _memoryCache);
             var result = await service.GetStats(CurrencyApiType.NBP, "EUR", "PLN", DateTime.Today, DateTime.Today);
-            result.Should().BeNull();
+            result.IsSuccess.Should().BeFalse();
         }
 
         [TearDown]
