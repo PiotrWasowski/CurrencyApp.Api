@@ -1,8 +1,8 @@
 ﻿using CurrencyApp.Application.Configuration;
-using CurrencyApp.Application.DTOs;
 using CurrencyApp.Application.Enums;
 using CurrencyApp.Application.Interfaces;
 using CurrencyApp.Application.Services;
+using CurrencyApp.Domain.Entities;
 using FluentAssertions;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
@@ -30,10 +30,10 @@ namespace CurrencyApp.Tests
         [Test]
         public async Task Should_Calculate_min_max_avg_correctly()
         {
-            var data = new List<CurrencyRateDto>() {
-                new() { Date = DateTime.Today.ToString(), Rate = 4 },
-                new() { Date = DateTime.Today.ToString(), Rate = 5 },
-                new() { Date = DateTime.Today.ToString(), Rate = 6 }
+            var data = new List<CurrencyRate>() {
+                new() { Date = DateTime.Today, Rate = 4 },
+                new() { Date = DateTime.Today, Rate = 5 },
+                new() { Date = DateTime.Today, Rate = 6 }
             };
 
             _providerMock
@@ -58,7 +58,7 @@ namespace CurrencyApp.Tests
         {
             _providerMock
                 .Setup(x => x.GetRatesAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                .ReturnsAsync(new List<CurrencyRateDto>());
+                .ReturnsAsync(new List<CurrencyRate>());
 
             _factoryMock
                 .Setup(x => x.GetProvider(CurrencyApiType.NBP))

@@ -1,9 +1,9 @@
-﻿using CurrencyApp.Application.DTOs;
+﻿using CurrencyApp.Application.Configuration;
 using CurrencyApp.Application.Exceptions;
 using CurrencyApp.Application.Interfaces;
-using System.Net.Http.Json;
-using CurrencyApp.Application.Configuration;
+using CurrencyApp.Domain.Entities;
 using Microsoft.Extensions.Options;
+using System.Net.Http.Json;
 
 namespace CurrencyApp.Infrastructure.Providers
 {
@@ -21,7 +21,7 @@ namespace CurrencyApp.Infrastructure.Providers
             _settings = settings.Value;
         }
 
-        public async Task<List<CurrencyDto>> GetCurrenciesAsync()
+        public async Task<List<Currency>> GetCurrenciesAsync()
         {
             var response = await _httpClient.GetAsync("exchangerates/tables/A/");
 
@@ -34,7 +34,7 @@ namespace CurrencyApp.Infrastructure.Providers
             if (table?.rates == null)
                 return [];
 
-            var list = table.rates.Select(r => new CurrencyDto
+            var list = table.rates.Select(r => new Currency
             {
                 Code = r.code,
                 Name = r.currency
@@ -42,7 +42,7 @@ namespace CurrencyApp.Infrastructure.Providers
 
             if (!list.Any(d => d.Code == PlnCode))
             {
-                list.Add(new CurrencyDto
+                list.Add(new Currency
                 {
                     Code = PlnCode,
                     Name = PlnName
@@ -52,27 +52,21 @@ namespace CurrencyApp.Infrastructure.Providers
             return list;
         }
 
-        public async Task<List<CurrencyRateDto>> GetRatesAsync(string from, string to, DateTime fromDate, DateTime toDate)
+        public async Task<List<CurrencyRate>> GetRatesAsync(string from, string to, DateTime fromDate, DateTime toDate)
         {
             if (from == to)
-                return new List<CurrencyRateDto>();
+                return new List<CurrencyRate>();
 
             // PLN -> X
             if (from == "PLN")
             {
                 var toRates = await GetRates(to, fromDate, toDate);
 
-                return toRates.Select(r => new CurrencyRateDto
+                return toRates.Select(r => new CurrencyRate
                 {
                     Date = r.Date,
                     Rate = 1 / r.Rate
                 }).ToList();
-            }
-
-            // X -> PLN
-            if (to == "PLN")
-            {
-                return await GetRates(from, fromDate, toDate);
             }
 
             // X -> PLN
@@ -88,14 +82,14 @@ namespace CurrencyApp.Infrastructure.Providers
             return fromRates.Join(toRates2,
                 f => f.Date,
                 t => t.Date,
-                (f, t) => new CurrencyRateDto
+                (f, t) => new CurrencyRate
                 {
                     Date = f.Date,
                     Rate = f.Rate / t.Rate
                 }).ToList();
         }
 
-        private async Task<List<CurrencyRateDto>> GetRates(
+        private async Task<List<CurrencyRate>> GetRates(
             string currency,
             DateTime fromDate,
             DateTime toDate)
@@ -108,16 +102,16 @@ namespace CurrencyApp.Infrastructure.Providers
             if (!response.IsSuccessStatusCode)
             {
                 if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
-                    return new List<CurrencyRateDto>();
+                    return new List<CurrencyRate>();
 
                 throw new ExternalApiException("NBP API failed");
             }
 
             var data = await response.Content.ReadFromJsonAsync<NbpResponse>();
 
-            return data.rates.Select(r => new CurrencyRateDto
+            return data.rates.Select(r => new CurrencyRate
             {
-                Date = r.effectiveDate.ToString(_settings.DateFormat),
+                Date = r.effectiveDate,
                 Rate = r.mid
             }).ToList();
         }
