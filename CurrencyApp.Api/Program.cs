@@ -5,9 +5,17 @@ using CurrencyApp.Application.Interfaces;
 using CurrencyApp.Application.Services;
 using CurrencyApp.Infrastructure.Providers;
 using Microsoft.Extensions.Options;
+using Serilog;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog((context, services, configuration) =>
+{
+    configuration
+        .ReadFrom.Configuration(context.Configuration)
+        .Enrich.FromLogContext();
+});
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -41,7 +49,6 @@ builder.Services.AddScoped<ICurrencyProviderFactory, CurrencyProviderFactory>();
 
 builder.Services.AddScoped<CurrencyService>();
 
-builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -57,6 +64,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseSerilogRequestLogging();
+
+app.UseMiddleware<RequestLoggingMiddleware>();
 app.UseMiddleware<ErrorHandlingMiddleware>();
 
 app.UseRouting();
