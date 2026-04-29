@@ -74,5 +74,146 @@ namespace CurrencyApp.Tests
         {
             _memoryCache.Dispose();
         }
+
+        [Test]
+        public async Task Should_use_cache_and_not_call_provider_twice()
+        {
+            var data = new List<Currency>
+            {
+                new() { Code = "EUR", Name = "Euro" },
+                new() { Code = "USD", Name = "US Dollar" }
+            };
+
+            _providerMock
+                .Setup(x => x.GetCurrenciesAsync())
+                .ReturnsAsync(data);
+
+            _factoryMock
+                .Setup(x => x.GetProvider(It.IsAny<CurrencyApiType>()))
+                .Returns(_providerMock.Object);
+
+            var service = new CurrencyService(
+                _factoryMock.Object,
+                _settings,
+                _memoryCache);
+
+            var result1 = await service.GetCurrencies(CurrencyApiType.NBP);
+            var result2 = await service.GetCurrencies(CurrencyApiType.NBP);
+
+            result1.Should().BeEquivalentTo(result2);
+
+            _providerMock.Verify(
+                x => x.GetCurrenciesAsync(),
+                Times.Once);
+        }
+
+        [Test]
+        public async Task Should_sort_currencies_by_code_asc_when_configured()
+        {
+            // ARRANGE
+            var data = new List<Currency>
+            {
+                new() { Code = "USD", Name = "US Dollar" },
+                new() { Code = "EUR", Name = "Euro" },
+                new() { Code = "GBP", Name = "British Pound" }
+            };
+
+            _providerMock
+                .Setup(x => x.GetCurrenciesAsync())
+                .ReturnsAsync(data);
+
+            _factoryMock
+                .Setup(x => x.GetProvider(It.IsAny<CurrencyApiType>()))
+                .Returns(_providerMock.Object);
+
+            var settings = Options.Create(new CurrencySettings
+            {
+                CacheDurationMinutes = 60,
+                DefaultSort = CurrencySort.CodeAsc
+            });
+
+            var service = new CurrencyService(
+                _factoryMock.Object,
+                settings,
+                _memoryCache);
+
+            var result = await service.GetCurrencies(CurrencyApiType.NBP);
+
+            result.Select(x => x.Code)
+                  .Should()
+                  .BeInAscendingOrder();
+        }
+
+        [Test]
+        public async Task Should_sort_currencies_by_code_desc_when_configured()
+        {
+            var data = new List<Currency>
+            {
+                new() { Code = "A", Name = "A" },
+                new() { Code = "C", Name = "C" },
+                new() { Code = "B", Name = "B" }
+            };
+
+            _providerMock
+                .Setup(x => x.GetCurrenciesAsync())
+                .ReturnsAsync(data);
+
+            _factoryMock
+                .Setup(x => x.GetProvider(It.IsAny<CurrencyApiType>()))
+                .Returns(_providerMock.Object);
+
+            var settings = Options.Create(new CurrencySettings
+            {
+                CacheDurationMinutes = 60,
+                DefaultSort = CurrencySort.CodeDesc
+            });
+
+            var service = new CurrencyService(
+                _factoryMock.Object,
+                settings,
+                _memoryCache);
+
+            var result = await service.GetCurrencies(CurrencyApiType.NBP);
+
+            result.Select(x => x.Code)
+                  .Should()
+                  .BeInDescendingOrder();
+        }
+
+        [Test]
+        public async Task Should_sort_currencies_by_name_asc_when_configured()
+        {
+            var data = new List<Currency>
+            {
+                new() { Code = "USD", Name = "Zebra" },
+                new() { Code = "EUR", Name = "Apple" },
+                new() { Code = "GBP", Name = "Monkey" }
+            };
+
+            _providerMock
+                .Setup(x => x.GetCurrenciesAsync())
+                .ReturnsAsync(data);
+
+            _factoryMock
+                .Setup(x => x.GetProvider(It.IsAny<CurrencyApiType>()))
+                .Returns(_providerMock.Object);
+
+            var settings = Options.Create(new CurrencySettings
+            {
+                CacheDurationMinutes = 60,
+                DefaultSort = CurrencySort.NameAsc
+            });
+
+            var service = new CurrencyService(
+                _factoryMock.Object,
+                settings,
+                _memoryCache);
+
+            var result = await service.GetCurrencies(CurrencyApiType.NBP);
+
+            result.Select(x => x.Name)
+                  .Should()
+                  .BeInAscendingOrder();
+        }
     }
 }
