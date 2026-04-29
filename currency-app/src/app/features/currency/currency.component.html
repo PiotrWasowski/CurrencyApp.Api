@@ -1,41 +1,102 @@
-<form [formGroup]="form" (ngSubmit)="submit()">
+<div class="page-container">
+  <mat-card>
+    <mat-card-content>
 
-  <select formControlName="apiType" (change)="loadCurrencies()">
-    <option value="Nbp">NBP</option>
-  </select>
+      <h2 style="text-align:center; margin-bottom:20px;">
+        Przelicznik walut
+      </h2>
 
-  <select formControlName="from">
-    <option *ngFor="let c of (currencies$ | async)" [value]="c.code">
-      {{ c.display }}
-    </option>
-  </select>
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <div class="form-container">
 
-  <select formControlName="to">
-    <option *ngFor="let c of (currencies$ | async)" [value]="c.code">
-      {{ c.display }}
-    </option>
-  </select>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>API</mat-label>
 
-  <input type="date" formControlName="fromDate">
-  <input type="date" formControlName="toDate">
+            <mat-select formControlName="apiType" (selectionChange)="loadCurrencies()">
+              <mat-option value="Nbp">NBP</mat-option>
+            </mat-select>
 
-  <button type="submit">Przelicz</button>
-</form>
+            <mat-error *ngIf="form.get('apiType')?.hasError('required')">
+              Wybierz API
+            </mat-error>
+          </mat-form-field>
 
-<div *ngIf="loading">Ładowanie...</div>
-<div *ngIf="error">{{ error }}</div>
+          <mat-form-field>
+            <mat-label>Waluta źródłowa</mat-label>
+            <mat-select formControlName="from">
+              <mat-option *ngFor="let c of (currencies$ | async)" [value]="c.code">
+                {{ c.display }}
+              </mat-option>
+            </mat-select>
 
-<div *ngIf="result$ | async as result">
-  <ng-container *ngIf="result">
-    <p>Min: {{ result.min }}</p>
-    <p>Max: {{ result.max }}</p>
-    <p>Avg: {{ result.avg }}</p>
+            <mat-error *ngIf="form.get('from')?.touched && form.get('from')?.invalid">
+              Wybierz walutę
+            </mat-error>
+          </mat-form-field>
 
-    <table>
-      <tr *ngFor="let r of result.rates">
-        <td>{{ r.date }}</td>
-        <td>{{ r.rate }}</td>
-      </tr>
-    </table>
-  </ng-container>  
+          <mat-form-field>
+            <mat-label>Waluta docelowa</mat-label>
+            <mat-select formControlName="to">
+              <mat-option *ngFor="let c of (currencies$ | async)" [value]="c.code">
+                {{ c.display }}
+              </mat-option>
+            </mat-select>
+
+            <mat-error *ngIf="form.get('to')?.touched && form.get('to')?.invalid">
+              Wybierz walutę
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Data od</mat-label>
+            <input matInput [matDatepicker]="picker1" formControlName="fromDate">
+            <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+            <mat-datepicker #picker1></mat-datepicker>
+
+            <mat-error *ngIf="form.get('fromDate')?.hasError('required')">
+              Wybierz datę
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Data od</mat-label>
+            <input matInput [matDatepicker]="picker2" formControlName="toDate">
+            <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+            <mat-datepicker #picker2></mat-datepicker>
+
+            <mat-error *ngIf="form.get('toDate')?.hasError('required')">
+              Wybierz datę
+            </mat-error>
+          </mat-form-field>
+
+          <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid || loading" class="full-width">
+            Przelicz
+          </button>
+
+        </div>
+      </form>
+
+      <div *ngIf="loading">Ładowanie...</div>
+      <div *ngIf="error">{{ error }}</div>
+      <div *ngIf="form.hasError('dateRange')" style="color:red">
+        Data "od" nie może być większa niż data "do"
+      </div>
+
+      <div *ngIf="result$ | async as result">
+        <ng-container *ngIf="result">
+          <p>Min: {{ result.min }}</p>
+          <p>Max: {{ result.max }}</p>
+          <p>Avg: {{ result.avg }}</p>
+
+          <table>
+            <tr *ngFor="let r of result.rates">
+              <td>{{ r.date }}</td>
+              <td>{{ r.rate }}</td>
+            </tr>
+          </table>
+        </ng-container>
+      </div>
+
+    </mat-card-content>
+  </mat-card>
 </div>
