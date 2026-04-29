@@ -31,9 +31,9 @@ namespace CurrencyApp.Tests
         public async Task Should_Calculate_min_max_avg_correctly()
         {
             var data = new List<CurrencyRateDto>() {
-                new() { Date = DateTime.Today, Rate = 4 },
-                new() { Date = DateTime.Today, Rate = 5 },
-                new() { Date = DateTime.Today, Rate = 6 }
+                new() { Date = DateTime.Today.ToString(), Rate = 4 },
+                new() { Date = DateTime.Today.ToString(), Rate = 5 },
+                new() { Date = DateTime.Today.ToString(), Rate = 6 }
             };
 
             _providerMock

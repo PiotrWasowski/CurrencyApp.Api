@@ -12,11 +12,11 @@ export const MY_DATE_FORMATS = {
     dateInput: 'yyyy-MM-dd',
   },
   display: {
-    dateInput: 'yyyy.MM.dd',
+    dateInput: 'dd.MM.yyyy',
     monthYearLabel: 'MMM yyyy',
-    dateA11yLabel: 'yyyy-MM-dd',
+    dateA11yLabel: 'dd.MM.yyyy',
     monthYearA11yLabel: 'MMMM yyyy',
-  },
+  }
 };
 
 export const appConfig: ApplicationConfig = {

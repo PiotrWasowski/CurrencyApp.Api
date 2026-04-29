@@ -13,6 +13,7 @@ namespace CurrencyApp.Infrastructure.Providers
         private readonly CurrencySettings _settings;
         private const string PlnCode = "PLN";
         private const string PlnName = "polski złoty";
+        private const string DateFormatApi = "yyyy-MM-dd";
 
         public NbpCurrencyProvider(HttpClient httpClient, IOptions<CurrencySettings> settings)
         {
@@ -99,9 +100,8 @@ namespace CurrencyApp.Infrastructure.Providers
             DateTime fromDate,
             DateTime toDate)
         {
-            var format = _settings.DateFormat;
 
-            var url = $"exchangerates/rates/A/{currency}/{fromDate.ToString(format)}/{toDate.ToString(format)}/";
+            var url = $"exchangerates/rates/A/{currency}/{fromDate.ToString(DateFormatApi)}/{toDate.ToString(DateFormatApi)}/";
 
             var response = await _httpClient.GetAsync(url);
 
@@ -117,7 +117,7 @@ namespace CurrencyApp.Infrastructure.Providers
 
             return data.rates.Select(r => new CurrencyRateDto
             {
-                Date = r.effectiveDate,
+                Date = r.effectiveDate.ToString(_settings.DateFormat),
                 Rate = r.mid
             }).ToList();
         }

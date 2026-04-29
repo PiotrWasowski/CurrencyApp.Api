@@ -2,7 +2,7 @@
 {
     public class CurrencyRateDto
     {
-        public DateTime Date { get; set; }
+        public string Date { get; set; } = default!;
         public decimal Rate { get; set; }
     }
 }

@@ -84,15 +84,47 @@
 
       <div *ngIf="result$ | async as result">
         <ng-container *ngIf="result">
-          <p>Min: {{ result.min }}</p>
-          <p>Max: {{ result.max }}</p>
-          <p>Avg: {{ result.avg }}</p>
+          <div *ngIf="result$ | async as result">
 
-          <table>
-            <tr *ngFor="let r of result.rates">
-              <td>{{ r.date }}</td>
-              <td>{{ r.rate }}</td>
-            </tr>
+            <div class="stats">
+              <div class="stat-box">
+                <div class="label">Min</div>
+                <div class="value">{{ result.min | number:'1.2-4' }}</div>
+              </div>
+
+              <div class="stat-box">
+                <div class="label">Max</div>
+                <div class="value">{{ result.max | number:'1.2-4' }}</div>
+              </div>
+
+              <div class="stat-box">
+                <div class="label">Średnia</div>
+                <div class="value">{{ result.avg | number:'1.2-4' }}</div>
+              </div>
+            </div>
+
+          </div>
+
+          <table class="rates-table" *ngIf="result.rates?.length">
+
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Kurs</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr *ngFor="let r of result.rates">
+                <td>{{ r.date }}</td>
+                <td>
+                  1 {{ form.value.from }} -
+                  {{ r.rate | number:'1.2-4' }}
+                  {{ form.value.to }}
+                </td>
+              </tr>
+            </tbody>
+
           </table>
         </ng-container>
       </div>

@@ -10,6 +10,7 @@ import { MatOptionModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatCardModule } from '@angular/material/card';
+import { MatTableModule } from '@angular/material/table';
 
 @Component({
   selector: 'app-currency',
@@ -22,7 +23,8 @@ import { MatCardModule } from '@angular/material/card';
     MatOptionModule,
     MatSelectModule,
     MatInputModule,
-    MatCardModule
+    MatCardModule,
+    MatTableModule
   ],
   templateUrl: './currency.component.html'
 })
