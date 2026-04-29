@@ -53,23 +53,22 @@ namespace CurrencyApp.Application.Services
         {
             var cacheKey = $"currencies:{apiType}";
 
-            if (_cache.TryGetValue(cacheKey, out List<CurrencyDto> cached))
+            return (await _cache.GetOrCreateAsync(cacheKey, async entry =>
             {
-                return cached;
-            }
+                entry.AbsoluteExpirationRelativeToNow =
+                    TimeSpan.FromMinutes(_settings.CacheDurationMinutes);
 
-            var provider = GetProvider(apiType);
+                var provider = _factory.GetProvider(apiType);
 
-            var list = await provider.GetCurrenciesAsync();
-            var sortedList = ApplySorting(
-                 list.Select(x => new CurrencyDto
-                 {
-                     Code = x.Code,
-                     Name = x.Name
-                 }).ToList());
+                var list = await provider.GetCurrenciesAsync();
 
-            _cache.Set(cacheKey, sortedList, TimeSpan.FromMinutes(_settings.CacheDurationMinutes));
-            return sortedList;
+                return ApplySorting(
+                    list.Select(x => new CurrencyDto
+                    {
+                        Code = x.Code,
+                        Name = x.Name
+                    }).ToList());
+            })) ?? new List<CurrencyDto>();
         }
 
         private List<CurrencyDto> ApplySorting(List<CurrencyDto> list)
