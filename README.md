@@ -1,4 +1,5 @@
 # CurrencyApp
+🇬🇧 English | 🇵🇱 [Polska wersja](README_PL.md)
 
 ## Description
 CurrencyApp is a full-stack application for fetching and analyzing currency exchange rates using the NBP (National Bank of Poland) API.
