@@ -1,9 +1,3 @@
-
----
-
-# 🇵🇱 README_PL.md
-
-```markdown
 # CurrencyApp
 
 ## Opis
@@ -73,12 +67,13 @@ flowchart LR
 ### Factory
 Używany do wyboru odpowiedniego providera walut.
 
-## Dependency Injection
+### Dependency Injection
 Stosowany w całej aplikacji dla testowalności i luźnego sprzężenia.
 
-## Result pattern
+### Result pattern
+Służy do obsługi wyników operacji zamiast zwracania wartości null lub zgłaszania wyjątków.
 
-## Middleware
+### Middleware
 Używany do logowania i obsługi błędów.
 
 ### Clean Architecture
@@ -87,7 +82,6 @@ Logika biznesowa niezależna od frameworka i infrastruktury.
 ---
 
 ## Frontend (Angular)
-
 - Interfejs wyboru waluty
 - Filtrowanie po dacie
 - Komunikacja z API przez HttpClient
@@ -95,7 +89,6 @@ Logika biznesowa niezależna od frameworka i infrastruktury.
 ---
 
 ## Logowanie
-
 - Serilog
 - Logowanie request/response
 - CorrelationId
