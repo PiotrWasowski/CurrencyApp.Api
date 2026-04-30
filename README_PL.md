@@ -1,4 +1,5 @@
 # CurrencyApp
+🇵🇱 Polski | 🇬🇧 [English version](README.md)
 
 ## Opis
 Aplikacja full-stack do pobierania i analizy kursów walut z API NBP.
